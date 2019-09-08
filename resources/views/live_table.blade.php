@@ -20,8 +20,7 @@
         <tr>
          <th>First Name</th>
          <th>Last Name</th>
-         <th>middle name</th>
-         <th>tut name</th>
+         <th>Delete</th>
         </tr>
        </thead>
        <tbody>
@@ -44,22 +43,21 @@ $(document).ready(function(){
  function fetch_data()
  {
   $.ajax({
-   url:"/tableedit/public/livetable/fetch_data",
+   url:"/livetable/fetch_data",
    dataType:"json",
    success:function(data)
    {
     var html = '';
     html += '<tr>';
-    // html += '<td contenteditable id="first_name"></td>';
-    // html += '<td contenteditable id="last_name"></td>';
-    // html += '<td><button type="button" class="btn btn-success btn-xs" id="add">Add</button></td></tr>';
+    html += '<td contenteditable id="first_name"></td>';
+    html += '<td contenteditable id="last_name"></td>';
+    html += '<td><button type="button" class="btn btn-success btn-xs" id="add">Add</button></td></tr>';
     for(var count=0; count < data.length; count++)
     {
      html +='<tr>';
      html +='<td contenteditable class="column_name" data-column_name="first_name" data-id="'+data[count].id+'">'+data[count].first_name+'</td>';
      html += '<td contenteditable class="column_name" data-column_name="last_name" data-id="'+data[count].id+'">'+data[count].last_name+'</td>';
-     html += '<td contenteditable class="column_name" data-column_name="middle_name" data-id="'+data[count].id+'">'+data[count].middle_name+'</td>';
-     html += '<td contenteditable class="column_name" data-column_name="tut" data-id="'+data[count].id+'">'+data[count].tut+'</td>';
+     html += '<td><button type="button" class="btn btn-danger btn-xs delete" id="'+data[count].id+'">Delete</button></td></tr>';
     }
     $('tbody').html(html);
    }
@@ -110,6 +108,23 @@ $(document).ready(function(){
   else
   {
    $('#message').html("<div class='alert alert-danger'>Enter some value</div>");
+  }
+ });
+
+ $(document).on('click', '.delete', function(){
+  var id = $(this).attr("id");
+  if(confirm("Are you sure you want to delete this records?"))
+  {
+   $.ajax({
+    url:"{{ route('livetable.delete_data') }}",
+    method:"POST",
+    data:{id:id, _token:_token},
+    success:function(data)
+    {
+     $('#message').html(data);
+     fetch_data();
+    }
+   });
   }
  });
 
